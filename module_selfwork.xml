@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_selfwork" default="compile.module.selfwork">
+  <dirname property="module.selfwork.basedir" file="${ant.file.module_selfwork}"/>
+  
+  <property name="module.jdk.home.selfwork" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.selfwork" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.selfwork" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.selfwork" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="selfwork.output.dir" value="${module.selfwork.basedir}/bin"/>
+  <property name="selfwork.testoutput.dir" value="${module.selfwork.basedir}/bin"/>
+  
+  <path id="selfwork.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="selfwork.module.production.classpath">
+    <path refid="${module.jdk.classpath.selfwork}"/>
+  </path>
+  
+  <path id="selfwork.runtime.production.module.classpath">
+    <pathelement location="${selfwork.output.dir}"/>
+  </path>
+  
+  <path id="selfwork.module.classpath">
+    <pathelement location="${selfwork.output.dir}"/>
+    <path refid="${module.jdk.classpath.selfwork}"/>
+  </path>
+  
+  <path id="selfwork.runtime.module.classpath">
+    <pathelement location="${selfwork.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.selfwork">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.selfwork">
+    <patternset refid="excluded.from.module.selfwork"/>
+  </patternset>
+  
+  <path id="selfwork.module.sourcepath">
+    <dirset dir="${module.selfwork.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.selfwork" depends="compile.module.selfwork.production,compile.module.selfwork.tests" description="Compile module SelfWork"/>
+  
+  <target name="compile.module.selfwork.production" depends="register.custom.compilers" description="Compile module SelfWork; production classes">
+    <mkdir dir="${selfwork.output.dir}"/>
+    <javac2 destdir="${selfwork.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.selfwork}/javac">
+      <compilerarg line="${compiler.args.selfwork}"/>
+      <bootclasspath refid="selfwork.module.bootclasspath"/>
+      <classpath refid="selfwork.module.production.classpath"/>
+      <src refid="selfwork.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.selfwork"/>
+    </javac2>
+    
+    <copy todir="${selfwork.output.dir}">
+      <fileset dir="${module.selfwork.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.selfwork.tests" depends="register.custom.compilers,compile.module.selfwork.production" description="compile module SelfWork; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.selfwork" description="cleanup module">
+    <delete dir="${selfwork.output.dir}"/>
+    <delete dir="${selfwork.testoutput.dir}"/>
+  </target>
+</project>
